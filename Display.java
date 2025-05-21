@@ -9,6 +9,7 @@ public class Display extends JFrame{
    private Direction currentDirection = Direction.RIGHT;
    private boolean placementPhase = true;
    private JLabel shipLengthLabel;
+   private boolean isReady = false;
    
    private final Color background = new Color(17, 17, 17);
    
@@ -88,9 +89,13 @@ public class Display extends JFrame{
       if(shipsToPlace.isEmpty()){
          placementPhase = false;
          shipLengthLabel.setText("-");
-         //set ready = true
+         isReady = true;
       }else{
          shipLengthLabel.setText("" + shipsToPlace.get(0));
       }
    }
+   
+   public boolean getISReady(){
+      return isReady;
+   }  
 }
