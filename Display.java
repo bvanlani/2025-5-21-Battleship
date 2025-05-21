@@ -5,7 +5,7 @@ import java.util.*;
 public class Display extends JFrame{
    private final Grid playerGrid;
    private final Grid targetGrid;
-   private final java.util.List<Integer> shipsToPlace = new ArrayList<>();
+   private final java.util.List<Battleship> shipsToPlace = new ArrayList<>();
    private Direction currentDirection = Direction.RIGHT;
    private boolean placementPhase = true;
    private JLabel shipLengthLabel;
@@ -52,13 +52,13 @@ public class Display extends JFrame{
    }
    
    private void setupShipStorage(){
-      shipsToPlace.add(5); // Carrier
-      shipsToPlace.add(4); // Battleship
-      shipsToPlace.add(3); // Cruiser
-      shipsToPlace.add(3); // Submarine
-      shipsToPlace.add(2); // Destroyer
+      shipsToPlace.add(new Battleship("Carrier", 5));
+      shipsToPlace.add(new Battleship("Battleship", 4));
+      shipsToPlace.add(new Battleship("Cruiser", 3));
+      shipsToPlace.add(new Battleship("Submarine", 3));
+      shipsToPlace.add(new Battleship("Destroyer", 2));
       
-      shipLengthLabel.setText("" + shipsToPlace.get(0));
+      shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
       enablePlacementMode();
    }
    
@@ -76,14 +76,14 @@ public class Display extends JFrame{
    private void handleShipPlacement(int startRow, int startCol){
       if(shipsToPlace.isEmpty()) return;
       
-      int length = shipsToPlace.get(0);
+      int length = shipsToPlace.get(0).getLength();
       
       if(!playerGrid.canPlaceShip(startRow, startCol, length, currentDirection)){
          System.out.println("Invalid ship placement.");
          return;
       }
       
-      playerGrid.placeShipTiles(startRow, startCol, length, currentDirection);
+      playerGrid.placeShipTiles(startRow, startCol, length, currentDirection, shipsToPlace.get(0));
       shipsToPlace.remove(0);
       
       if(shipsToPlace.isEmpty()){
@@ -91,7 +91,7 @@ public class Display extends JFrame{
          shipLengthLabel.setText("-");
          isReady = true;
       }else{
-         shipLengthLabel.setText("" + shipsToPlace.get(0));
+         shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
       }
    }
    

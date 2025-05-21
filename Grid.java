@@ -48,11 +48,12 @@ public class Grid extends JPanel{
       }
    }
    
-   public void placeShipTiles(int startRow, int startCol, int length, Direction dir){
+   public void placeShipTiles(int startRow, int startCol, int length, Direction dir, Battleship bs){
       for(int i=0;i<length;i++){
          int r = startRow + dir.dRow * i;
          int c = startCol + dir.dCol * i;
          board[r][c].setType("ship");
+         bs.addShipPart(board[r][c]);
       }
    }
    

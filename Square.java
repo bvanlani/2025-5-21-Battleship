@@ -44,7 +44,7 @@ public class Square extends JButton{
    
    //Sets square to hit and changes color
    public boolean hitSquare(Color color){
-      updateColor(color);
+      updateColor();
       setEnabled(false);
       isHit = true;
       return true;
@@ -57,11 +57,16 @@ public class Square extends JButton{
    
    public void setType(String type){
       this.squareType = type;
+      updateColor();
    }
    
    //Update color
-   public void updateColor(Color color){
-      setBackground(color);
+   public void updateColor(){
+      if(squareType == "ship"){
+         setBackground(new Color(87, 87, 87));
+      }else if(squareType == "water"){
+         setBackground(new Color(73, 93, 121));
+      }
    }
    
    //get the current color
