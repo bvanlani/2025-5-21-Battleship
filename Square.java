@@ -63,9 +63,9 @@ public class Square extends JButton{
    //Update color
    public void updateColor(){
       if(squareType == "ship"){
-         setBackground(new Color(87, 87, 87));
+         setBackground(ColorPalette.SHIP);
       }else if(squareType == "water"){
-         setBackground(new Color(73, 93, 121));
+         setBackground(ColorPalette.WATER);
       }
    }
    

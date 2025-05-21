@@ -16,7 +16,7 @@ public class Grid extends JPanel{
       this.rows = rows;
       this.cols = cols;
       setLayout(new GridLayout(rows, cols, 2, 2));
-      setBackground(background);
+      setBackground(ColorPalette.BACKGROUND);
       board = new Square[rows][cols];
       
       for(int r=0;r<rows;r++){
@@ -24,7 +24,7 @@ public class Grid extends JPanel{
             board[r][c] = new Square(r, c, false, "water");
             board[r][c].setPreferredSize(new Dimension(size, size));
             board[r][c].setOpaque(true);
-            board[r][c].setBackground(water);
+            board[r][c].setBackground(ColorPalette.WATER);
             board[r][c].setBorderPainted(false);
             this.add(board[r][c]);
          }

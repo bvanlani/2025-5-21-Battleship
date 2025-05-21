@@ -23,7 +23,7 @@ public class Display extends JFrame{
       
       JPanel gridsPanel = new JPanel();
       gridsPanel.setLayout(new BoxLayout(gridsPanel, BoxLayout.Y_AXIS));
-      gridsPanel.setBackground(background);
+      gridsPanel.setBackground(ColorPalette.BACKGROUND);
       
       gridsPanel.add(targetGrid);
       gridsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
