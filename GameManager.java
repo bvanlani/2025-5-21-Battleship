@@ -13,8 +13,8 @@ public class GameManager{
    //Contains a boolean variable that represents whether or not the game is running.
    private boolean gameRunning;
    
-   //Contains either the player1 or player2 object, depending on whose turn it is supposed to be. Probably will only be used in the switchTurns method.
-   private Player currentPlayer; //Maybe we could change it to String or int instead?
+   //Should only contain a '1' or a '2', with the numbers representing which player's turn it is.
+   private int currentTurn;
    
    private Player player1; 
    
@@ -22,8 +22,11 @@ public class GameManager{
    
    private Display gameDisplay;
    
+   //Contains a boolean variable, which represents whether either of the players have had all their ships sunk or not.
+   private boolean isGameOver;
+   
    /*
-    * Creates a new instance of a GameManager object, updating the instance variables by using the objects in the parameters.
+    * Creates a new instance of a GameManager object, updating the instance variables by using the objects in the parameters. - Toryn
     *
     * @param player1 The first player that will be participating in the game.
     * @param player2 The second player that will be participating in the game.
@@ -35,36 +38,47 @@ public class GameManager{
       this.player1 = player1;
       this.player2 = player2;
       
-      currentPlayer = player1;
+      currentTurn = 1;
+      
+      isGameOver = false;
       
       gameDisplay = display;
    }
    
    
    /*
-    * Updates the currentPlayer object, so that it is the same as the player whose turn it is supposed to be.
+    * Updates the currentTurn object, so that it changes to either 1 or 2, depending on which player's turn it is about to be. - Toryn
     */
    public void switchTurns(){
-      if(currentPlayer.equals(player1)){
-         currentPlayer = player2;
+      if(currentTurn == 1){
+         currentTurn = 2;
       }
       else{
-         currentPlayer = player1;
+       currentTurn = 1;
       }
    }
-   
-                              
-   /*                                           Maybe we could make it color based? Like the spaces meant to represent water are light blue. May have to discuss this with everyone later on. - Toryn
-    *                                           v
-    * Creates a grid where each space has the default value (which represents water) assigned to it.
+   /*
     *
+    * Depending on which player's turn it is, the code will run through the fleets each player has and check if any of their ships have not been sunk yet.
+    * If there is at least one ship that has not been sunk yet, the code will return false. Otherwise, the code will return true. - Toryn
     *
-    * CANNOT BE COMPLETED UNTIL THE GRID, SQUARE, SHIP, AND OTHER CLASSES ARE COMPLETED... i think.
     */
-   public Grid createEmptyBoard(Grid gridToFill){
-      Grid rtrndGrid = gridToFill;
-      
-      return rtrndGrid;
+   public boolean checkForGameOver(){
+      if(currentTurn == 1){
+         for(Battleship s : player1.getFleet()){ 
+            if(s.checkIsSunk() == false){
+               return false;
+            }
+         }
+      }
+      else{
+         for(Battleship s: player2.getFleet()){
+            if(s.checkIsSunk() == false){
+               return false;
+            }
+         }
+      }
+      return true;
    }
    
    /*
