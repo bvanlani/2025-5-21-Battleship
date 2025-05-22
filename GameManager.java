@@ -10,7 +10,7 @@ import java.util.*;
 public class GameManager{
 
    //Contains a boolean variable that represents whether or not the game is running.
-   private boolean gameRunning;
+   private boolean gameRunning = false;
    
    //Should only contain a '1' or a '2', with the numbers representing which player's turn it is.
    private int currentTurn;
@@ -25,7 +25,7 @@ public class GameManager{
    
    
    //Contains a boolean variable, which represents whether either of the players have had all their ships sunk or not.
-   private boolean isGameOver;
+   private boolean isGameOver = false;
    
    /*
     * Creates a new instance of a GameManager object, updating the instance variables by using the objects in the parameters. - Toryn
@@ -35,7 +35,6 @@ public class GameManager{
     * @param display The window where Battleship will be played.
     */
    public GameManager(Player player1, Player player2, Display display1, Display display2){
-      gameRunning = false;
       
       this.player1 = player1;
       this.player2 = player2;
@@ -44,9 +43,7 @@ public class GameManager{
       player2Display = display2;
       
       currentTurn = 1;
-      
-      isGameOver = false;
-      
+           
    }
    
    
@@ -88,7 +85,9 @@ public class GameManager{
    }
    
    private void player1Turn(){
-      player1Display.setVisible(true);
+      if(player1Display.getISReady()){
+         
+      }
    }
    
    private void player2Turn(){
