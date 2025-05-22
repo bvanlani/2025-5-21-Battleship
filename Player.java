@@ -23,36 +23,44 @@ public class Player {
    
    // Functions
    // Getters
+
+   // Returns the whole fleet and the ships data
    public Battleship[] getFleet () {
       return fleet;
    }
-   
+
+   // Returns a certain ship inside of the fleet, checks index is within range
    public Battleship getIndexFleet (int index) {
       if (index < 0 || index > fleet_size - 1) return null;
       
       return fleet[index];
    }
-   
+
+   // Gets if its the players turn
    public boolean getIsTurn () {
       return is_turn;
    }
    
    // Setters
+   // Sets the whole fleet with an inputed fleet
    public void setFleet (Battleship[] in_fleet) {
       fleet = in_fleet;
    }
-  
+
+   // Set a certain battleship in fleet, checks index is within range
    public void setIndexFleet (Battleship in_ship, int index){
       if (index < 0 || index > fleet_size - 1) return;
       
       fleet[index] = in_ship;
    }
-   
+
+   // Sets turn state of player
    public void setTurn (boolean state) {
       is_turn = state;
    }
    
    // Standard Functions
+   // Initialize and setups fleet, might be deprecated
    public void initializeFleet () {
       ;
    }
