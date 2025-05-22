@@ -88,6 +88,9 @@ public class GameManager{
       if(player1Display.getISReady()){
          
       }
+      else{
+         return;
+      }
    }
    
    private void player2Turn(){
@@ -98,6 +101,14 @@ public class GameManager{
     * Starts the game of Battleship.
     */
    public void startGame(){
+      for(Square[] row : player1Display.getTargetGrid().getBoard()){
+         for(Square space : row){
+            int xPos = space.getPositionX();
+            int yPos = space.getPositionY();
+            
+            player1Display.getTargetGrid().
+         }
+      }
       while(!(isGameOver)){
        
        }
