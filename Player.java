@@ -25,17 +25,27 @@ public class Player {
    // Getters
 
    // Returns the whole fleet and the ships data
+   /*
+   @return Battleship[] -> the current whole fleet
+   */
    public Battleship[] getFleet () {
       return fleet;
    }
 
    // Returns a certain ship inside of the fleet, checks index is within range
+   /*
+   @param int index -> the index in fleet that will be recieved
+   @return Battleship -> the Battlship in fleet
+   */
    public Battleship getIndexFleet (int index) {
       if (index < 0 || index > fleet_size - 1) return null;
       
       return fleet[index];
    }
 
+   /*
+   @return boolean -> the current turn state of the player
+   */
    // Gets if its the players turn
    public boolean getIsTurn () {
       return is_turn;
@@ -43,11 +53,18 @@ public class Player {
    
    // Setters
    // Sets the whole fleet with an inputed fleet
+   /*
+   @param Battleship[] in_fleet -> input fleet to set the current fleet
+   */
    public void setFleet (Battleship[] in_fleet) {
       fleet = in_fleet;
    }
 
    // Set a certain battleship in fleet, checks index is within range
+   /*
+   @param Battleship in_ship -> the input ship to be stored in the fleet
+   @param int index -> the index location in fleet where the ship will be stored
+   */
    public void setIndexFleet (Battleship in_ship, int index){
       if (index < 0 || index > fleet_size - 1) return;
       
@@ -55,6 +72,9 @@ public class Player {
    }
 
    // Sets turn state of player
+   /*
+   @param boolean state -> the input bool state that will be set for the player
+   */
    public void setTurn (boolean state) {
       is_turn = state;
    }
