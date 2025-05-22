@@ -98,4 +98,8 @@ public class Display extends JFrame{
    public boolean getISReady(){
       return isReady;
    }  
+   
+   public Grid getTargetGrid(){
+      return targetGrid;
+   }
 }
