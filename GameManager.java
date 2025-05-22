@@ -1,8 +1,7 @@
 /*
  * This class represents a game of Battleship. It contains the 
  *
- * Code written by Toryn Bieri & Ethan Benzaquen. (Maybe we should have some sort of indicator that shows who certain parts of code were written by? 
-  *                                                We'll also need to find a way to share what parts of code we updated in the code itself. - Toryn)
+ * Code written by Toryn Bieri & Ethan Benzaquen.
  */
 
 import java.util.*;
@@ -12,9 +11,6 @@ public class GameManager{
 
    //Contains a boolean variable that represents whether or not the game is running.
    private boolean gameRunning;
-   
-   //Should only contain a '1' or a '2', with the numbers representing which player's turn it is.
-   private int currentTurn;
    
    private Player player1; 
    
@@ -50,11 +46,13 @@ public class GameManager{
     * Updates the currentTurn object, so that it changes to either 1 or 2, depending on which player's turn it is about to be. - Toryn
     */
    public void switchTurns(){
-      if(currentTurn == 1){
-         currentTurn = 2;
+      if(player1.getIsTurn()){
+         player1.setTurn(false);
+         player2.setTurn(true);
       }
       else{
-       currentTurn = 1;
+       player2.setTurn(false);
+       player1.setTurn(true);
       }
    }
    /*
@@ -81,12 +79,22 @@ public class GameManager{
       return true;
    }
    
+   public void player1Turn(){
+      
+   }
+   
+   public void player2Turn(){
+   
+   }
+   
    /*
     * Starts the game of Battleship.
     */
    public void startGame(){
    
+      while(!(isGameOver)){
+      
+      }
    }
-
-
+   
 }
