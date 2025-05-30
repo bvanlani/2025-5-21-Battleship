@@ -4,7 +4,7 @@
  * Manages the game state for the Battleship game.
  *
  * Date: May 28, 2025
- * Author: Ethan Benzaquen
+ * Author: Ethan Benzaquen and Ethan Drane
  */
 
 import javax.swing.*;
@@ -25,25 +25,16 @@ public class GameManager {
      */
     private Player currentPlayer;
 
-    /**
-     * Player 1 in the game.
-     */
-    private Player player1;
-
-    /**
-     * Player 2 in the game.
-     */
-    private Player player2;
-
+   
     /**
      * Display for player 1.
      */
-    private Display d1;
+    private Player p1;
 
     /**
      * Display for player 2.
      */
-    private Display d2;
+    private Player p2;
 
     /**
      * Constructs a new GameManager instance.
@@ -51,11 +42,9 @@ public class GameManager {
      */
     public GameManager() {
         currentPlayer = null;
-        player1 = new Player();
-        player2 = new Player();
-
-        d1 = new Display("player1");
-        d2 = new Display("player2");
+        
+        p1 = new Player("player1");
+        p2 = new Player("player2");
     }
     
     /**
@@ -96,10 +85,10 @@ public class GameManager {
             if (ship.checkIsSunk()) {
                 ArrayList<Square> shipSquares = ship.getShipParts();
                 
-                Grid opposingGrid = d1.getTargetGrid();
+                Grid opposingGrid = p1.getTargetGrid();
                 
-                if (currentPlayer.equals(player1)) {
-                     opposingGrid = d2.getTargetGrid();
+                if (currentPlayer.equals(p1)) {
+                     opposingGrid = p2.getTargetGrid();
                  }
                 
                 for (int s = 0; s < shipSquares.size(); s++) {
@@ -113,9 +102,9 @@ public class GameManager {
                 currentPlayer.removeShip(ship);
                 
                 if (fleet.isEmpty()) {
-                    if (currentPlayer.equals(player1)) {
+                    if (currentPlayer.equals(p1)) {
                         System.out.println("Player 2 won!");
-                    } else if (currentPlayer.equals(player2)) {
+                    } else if (currentPlayer.equals(p2)) {
                         System.out.println("Player 1 won!");
                     } else {
                         System.out.println("fleet empty Doesn't work");
@@ -130,13 +119,13 @@ public class GameManager {
      * and attaching the necessary event listeners to the display grids.
      */
     public void run() {
-        currentPlayer = player1;
+        currentPlayer = p1;
         
-        player1.setFleet(d1.getPlayerGrid().getShips());
-        player2.setFleet(d2.getPlayerGrid().getShips());
+        p1.setFleet(p1.getPlayerGrid().getShips());
+        p2.setFleet(p2.getPlayerGrid().getShips());
                            
-        addBoardEventListeners(player1, d1.getTargetGrid(), d2.getPlayerGrid());
-        addBoardEventListeners(player2, d2.getTargetGrid(), d1.getPlayerGrid());
+        addBoardEventListeners(p1, p1.getTargetGrid(), p2.getPlayerGrid());
+        addBoardEventListeners(p2, p2.getTargetGrid(), p1.getPlayerGrid());
         
         isReadyEventListener();
     }
@@ -147,11 +136,11 @@ public class GameManager {
      * and disables the start buttons to prevent reinitialization.
      */
     public void gameRun() {
-        if (d1.getIsReady() && d2.getIsReady()) {
-            setUpShips(d1.getPlayerGrid(), d2.getTargetGrid());
-            setUpShips(d2.getPlayerGrid(), d1.getTargetGrid());
-            d1.getStart().setEnabled(false);
-            d2.getStart().setEnabled(false);
+        if (p1.getIsReady() && p2.getIsReady()) {
+            setUpShips(p1.getPlayerGrid(), p2.getTargetGrid());
+            setUpShips(p2.getPlayerGrid(), p1.getTargetGrid());
+            p1.getStart().setEnabled(false);
+            p2.getStart().setEnabled(false);
         }
     }
     
@@ -160,8 +149,8 @@ public class GameManager {
      * When activated, these listeners call the gameRun method to begin the game.
      */
     public void isReadyEventListener() {
-        d1.getStart().addActionListener(e -> gameRun());
-        d2.getStart().addActionListener(e -> gameRun());
+        p1.getStart().addActionListener(e -> gameRun());
+        p2.getStart().addActionListener(e -> gameRun());
     }
     
     /**
@@ -186,14 +175,14 @@ public class GameManager {
    
                 opSquare.addActionListener(new ActionListener() { 
                     public void actionPerformed(ActionEvent e) {
-                        if (p == currentPlayer && d1.getIsReady() && d2.getIsReady()) {
+                        if (p == currentPlayer && p1.getIsReady() && p2.getIsReady()) {
                             sendHit(opSquare);
                             sendHit(pSquare);
                                                 
-                            if (currentPlayer == player1) {
-                                currentPlayer = player2;
+                            if (currentPlayer == p1) {
+                                currentPlayer = p2;
                             } else {
-                                currentPlayer = player1;
+                                currentPlayer = p1;
                             }
                             
                             checkIfShipSunk();

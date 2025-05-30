@@ -1,30 +1,136 @@
-// Author: Tyerone Chen
-// Create Date: 5/20/2025
-// Update Date: 5/20/2025
-
-// Imports
+import javax.swing.*;
+import java.awt.*;
 import java.util.*;
 
-// Player class which handles and stores information such as battle ships, as well as actions
+public class Player extends JFrame{
 
-public class Player {
-   // Constants
-   
-   // Variables
-   private static final int fleet_size = 5;
+   // player variable
    private ArrayList<Battleship> fleet = new ArrayList<Battleship>();
-   private boolean is_turn;
    
-   // Constructors
-   public Player() {
-      //this.fleet = new Battleship[5];
-      this.is_turn = false;
-      //initializeFleet();
+   private final Grid playerGrid;
+   private final Grid targetGrid;
+   private final java.util.List<Battleship> shipsToPlace = new ArrayList<>();
+   private Direction currentDirection = Direction.RIGHT;
+   private boolean placementPhase = true;
+   private JLabel shipLengthLabel;
+   private JButton start;
+   private boolean isReady = false;
+   
+   private final Color background = new Color(17, 17, 17);
+   
+   public Player(String name){
+      setTitle(name);
+      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setLayout(new BorderLayout());
+     
+      playerGrid = new Grid(10, 10);
+      targetGrid = new Grid(10, 10);
+     
+      JPanel gridsPanel = new JPanel();
+      gridsPanel.setLayout(new BoxLayout(gridsPanel, BoxLayout.Y_AXIS));
+      gridsPanel.setBackground(ColorPalette.getBackgroundColor());
+     
+      gridsPanel.add(targetGrid);
+      gridsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+      gridsPanel.add(playerGrid);
+      this.add(gridsPanel, BorderLayout.CENTER);
+           
+      JButton rotateButton = new JButton("Rotate (" +currentDirection + ")");
+      rotateButton.addActionListener(e -> {
+         currentDirection = currentDirection.next();
+         rotateButton.setText("Rotate (" + currentDirection + ")");
+      });
+     
+      shipLengthLabel = new JLabel("-");
+      shipLengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
+     
+      JPanel controlPanel = new JPanel(new BorderLayout());
+      controlPanel.add(shipLengthLabel, BorderLayout.CENTER);
+      controlPanel.add(rotateButton, BorderLayout.WEST);
+      
+      this.start = new JButton("Start");
+      controlPanel.add(start, BorderLayout.EAST);
+     
+      this.add(controlPanel, BorderLayout.SOUTH);
+     
+      this.pack();
+      this.setVisible(true);
+     
+      setupShipStorage();
    }
    
-   // Functions
-   // Getters
+   private void setupShipStorage(){
+      shipsToPlace.add(new Battleship("Carrier", 5));
+      shipsToPlace.add(new Battleship("Battleship", 4));
+      shipsToPlace.add(new Battleship("Cruiser", 3));
+      shipsToPlace.add(new Battleship("Submarine", 3));
+      shipsToPlace.add(new Battleship("Destroyer", 2));
+     
+      shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
+      enablePlacementMode();
+   }
+   
+   private void enablePlacementMode(){
+      JButton[][] board = playerGrid.getBoard();
+      for(int r = 0; r< board.length;r++){
+         for(int c = 0;c < board[r].length; c++){
+            int row = r;
+            int col = c;
+            board[r][c].addActionListener(e -> handleShipPlacement(row, col));
+         }
+      }
+   }
+   
+   private void handleShipPlacement(int startRow, int startCol){
+      if(shipsToPlace.isEmpty()) return;
+     
+      int length = shipsToPlace.get(0).getLength();
+     
+      if(!playerGrid.canPlaceShip(startRow, startCol, length, currentDirection)){
+      System.out.println("Trying to place ship at: (" + startRow + "," + startCol + ")");
 
+         System.out.println("Invalid ship placement.");
+         return;
+      }
+     
+      playerGrid.placeShipTiles(startRow, startCol, length, currentDirection, shipsToPlace.get(0));
+      shipsToPlace.remove(0);
+     
+      if(shipsToPlace.isEmpty()){
+         placementPhase = false;
+         shipLengthLabel.setText("-");
+         
+         start.addActionListener(e -> {
+            isReady = true;
+         });
+      
+      }else{
+         shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
+      }
+   }
+  
+   public java.util.List<Battleship> getShipsToPlace(){
+      return shipsToPlace;
+   }
+   
+   public JButton getStart(){
+      return start;
+   }
+   
+   public boolean getIsReady(){
+      return isReady;
+   }  
+   
+   public Grid getPlayerGrid(){
+      return playerGrid;
+   }
+   
+   public Grid getTargetGrid(){
+      return targetGrid;
+   }
+   
+   // Player Methods
+   
    // Returns the whole fleet and the ships data
    /*
    @return Battleship[] -> the current whole fleet
@@ -32,52 +138,13 @@ public class Player {
    public ArrayList<Battleship> getFleet () {
       return fleet;
    }
-
-   // Returns a certain ship inside of the fleet, checks index is within range
-   /*
-   @param int index -> the index in fleet that will be recieved
-   @return Battleship -> the Battlship in fleet
-   */
-   public Battleship getIndexFleet (int index) {
-      if (index < 0 || index > fleet_size - 1) return null;
-      
-      return fleet.get(index);
-   }
-
-   /*
-   @return boolean -> the current turn state of the player
-   */
-   // Gets if its the players turn
-   public boolean getIsTurn () {
-      return is_turn;
-   }
    
-   // Setters
    // Sets the whole fleet with an inputed fleet
    /*
    @param Battleship[] in_fleet -> input fleet to set the current fleet
    */
    public void setFleet (ArrayList<Battleship> in_fleet) {
       fleet = in_fleet;
-   }
-
-   // Set a certain battleship in fleet, checks index is within range
-   /*
-   @param Battleship in_ship -> the input ship to be stored in the fleet
-   @param int index -> the index location in fleet where the ship will be stored
-   */
-   public void setIndexFleet (Battleship in_ship, int index){
-      if (index < 0 || index > fleet_size - 1) return;
-      
-      fleet.set(index, in_ship);
-   }
-
-   // Sets turn state of player
-   /*
-   @param boolean state -> the input bool state that will be set for the player
-   */
-   public void setTurn (boolean state) {
-      is_turn = state;
    }
    
    public void removeShip(Battleship ship){
@@ -93,4 +160,5 @@ public class Player {
          
       }
    }
+   
 }
