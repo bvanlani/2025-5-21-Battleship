@@ -9,6 +9,7 @@ public class Display extends JFrame{
    private Direction currentDirection = Direction.RIGHT;
    private boolean placementPhase = true;
    private JLabel shipLengthLabel;
+   private JButton start;
    private boolean isReady = false;
    
    private final Color background = new Color(17, 17, 17);
@@ -29,7 +30,7 @@ public class Display extends JFrame{
       gridsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
       gridsPanel.add(playerGrid);
       this.add(gridsPanel, BorderLayout.CENTER);
-     
+           
       JButton rotateButton = new JButton("Rotate (" +currentDirection + ")");
       rotateButton.addActionListener(e -> {
          currentDirection = currentDirection.next();
@@ -41,7 +42,10 @@ public class Display extends JFrame{
      
       JPanel controlPanel = new JPanel(new BorderLayout());
       controlPanel.add(shipLengthLabel, BorderLayout.CENTER);
-      controlPanel.add(rotateButton, BorderLayout.EAST);
+      controlPanel.add(rotateButton, BorderLayout.WEST);
+      
+      this.start = new JButton("Start");
+      controlPanel.add(start, BorderLayout.EAST);
      
       this.add(controlPanel, BorderLayout.SOUTH);
      
@@ -79,6 +83,8 @@ public class Display extends JFrame{
       int length = shipsToPlace.get(0).getLength();
      
       if(!playerGrid.canPlaceShip(startRow, startCol, length, currentDirection)){
+      System.out.println("Trying to place ship at: (" + startRow + "," + startCol + ")");
+
          System.out.println("Invalid ship placement.");
          return;
       }
@@ -89,15 +95,31 @@ public class Display extends JFrame{
       if(shipsToPlace.isEmpty()){
          placementPhase = false;
          shipLengthLabel.setText("-");
-         isReady = true;
+         
+         start.addActionListener(e -> {
+            isReady = true;
+         });
+      
       }else{
          shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
       }
    }
+  
+   public java.util.List<Battleship> getShipsToPlace(){
+      return shipsToPlace;
+   }
    
-   public boolean getISReady(){
+   public JButton getStart(){
+      return start;
+   }
+   
+   public boolean getIsReady(){
       return isReady;
    }  
+   
+   public Grid getPlayerGrid(){
+      return playerGrid;
+   }
    
    public Grid getTargetGrid(){
       return targetGrid;

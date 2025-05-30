@@ -1,117 +1,226 @@
-/*
- * This class represents a game of Battleship. It contains the 
+/**
+ * GameManager.java
  *
- * Code written by Toryn Bieri & Ethan Benzaquen.
+ * Manages the game state for the Battleship game.
+ *
+ * Date: May 28, 2025
+ * Author: Ethan Benzaquen
  */
 
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
-//Insert other imports here when we figure out what we will need.
 
-public class GameManager{
+/**
+ * The GameManager class is responsible for managing players, game state,
+ * event listeners, and the interactions between the game components.
+ * It initializes the players, sets up the display boards, handles player
+ * actions, and monitors the game progress (e.g., sending hits and checking for sunk ships).
+ */
+public class GameManager {
 
-   //Contains a boolean variable that represents whether or not the game is running.
-   private boolean gameRunning = false;
-   
-   //Should only contain a '1' or a '2', with the numbers representing which player's turn it is.
-   private int currentTurn;
-   
-   private Player player1; 
-   
-   private Player player2;
-   
-   private Display player1Display;
-   
-   private Display player2Display;
-   
-   
-   //Contains a boolean variable, which represents whether either of the players have had all their ships sunk or not.
-   private boolean isGameOver = false;
-   
-   /*
-    * Creates a new instance of a GameManager object, updating the instance variables by using the objects in the parameters. - Toryn
-    *
-    * @param player1 The first player that will be participating in the game.
-    * @param player2 The second player that will be participating in the game.
-    * @param display The window where Battleship will be played.
-    */
-   public GameManager(Player player1, Player player2, Display display1, Display display2){
-      
-      this.player1 = player1;
-      this.player2 = player2;
-      
-      player1Display = display1;
-      player2Display = display2;
-      
-      currentTurn = 1;
-           
-   }
-   
-   
-   /*
-    * Updates the currentTurn object, so that it changes to either 1 or 2, depending on which player's turn it is about to be. - Toryn
-    */
-   private void switchTurns(){
-      if(player1.getIsTurn()){
-         player1.setTurn(false);
-         player2.setTurn(true);
-      }
-      else{
-       player2.setTurn(false);
-       player1.setTurn(true);
-      }
-   }
-   /*
-    *
-    * Depending on which player's turn it is, the code will run through the fleets each player has and check if any of their ships have not been sunk yet.
-    * If there is at least one ship that has not been sunk yet, the code will return false. Otherwise, the code will return true. - Toryn
-    *
-    */
-   private boolean checkForGameOver(){
-      if(currentTurn == 1){
-         for(Battleship s : player1.getFleet()){ 
-            if(s.checkIsSunk() == false){
-               return false;
+    /**
+     * The current player whose turn is active.
+     */
+    private Player currentPlayer;
+
+    /**
+     * Player 1 in the game.
+     */
+    private Player player1;
+
+    /**
+     * Player 2 in the game.
+     */
+    private Player player2;
+
+    /**
+     * Display for player 1.
+     */
+    private Display d1;
+
+    /**
+     * Display for player 2.
+     */
+    private Display d2;
+
+    /**
+     * Constructs a new GameManager instance.
+     * Initializes player objects and display boards for both players.
+     */
+    public GameManager() {
+        currentPlayer = null;
+        player1 = new Player();
+        player2 = new Player();
+
+        d1 = new Display("player1");
+        d2 = new Display("player2");
+    }
+    
+    /**
+     * Processes a hit on the specified square.
+     * If the square has not been hit before, this method updates the square's appearance
+     * based on its type (e.g., ship or water).
+     *
+     * @param square The square targeted for the hit.
+     */
+    public void sendHit(Square square) {
+        if (!square.getIsHit()) {
+            switch (square.getType()) {
+                case "ship":
+                    square.hitSquare(ColorPalette.getFlagColor());
+                    break;
+                case "water":
+                    square.hitSquare(ColorPalette.getWaterHit());
+                    break;
+                default:
+                    System.out.println("Unknown square type: " + square.getType());
+                    break;
             }
-         }
-      }
-      else{
-         for(Battleship s: player2.getFleet()){
-            if(s.checkIsSunk() == false){
-               return false;
+        }
+    }    
+    
+    /**
+     * Checks if any ship in the current player's fleet has been sunk.
+     * If a ship is sunk, its corresponding squares are updated to reflect the sunk state,
+     * and the ship is removed from the player's fleet.
+     * If the player's fleet becomes empty, the opponent is declared the winner.
+     */
+    public void checkIfShipSunk() {
+        ArrayList<Battleship> fleet = currentPlayer.getFleet();
+        
+        for (int f = 0; f < fleet.size(); f++) {    
+                
+            Battleship ship = fleet.get(f);
+            if (ship.checkIsSunk()) {
+                ArrayList<Square> shipSquares = ship.getShipParts();
+                
+                Grid opposingGrid = d1.getTargetGrid();
+                
+                if (currentPlayer.equals(player1)) {
+                     opposingGrid = d2.getTargetGrid();
+                 }
+                
+                for (int s = 0; s < shipSquares.size(); s++) {
+                    Square shipSquare = shipSquares.get(s);
+                    
+                    shipSquare.setBackground(ColorPalette.getSunkShip());
+                    
+                    opposingGrid.getSquare(shipSquare.getPositionX(), shipSquare.getPositionY()).setBackground(ColorPalette.getSunkShip());
+                }
+                
+                currentPlayer.removeShip(ship);
+                
+                if (fleet.isEmpty()) {
+                    if (currentPlayer.equals(player1)) {
+                        System.out.println("Player 2 won!");
+                    } else if (currentPlayer.equals(player2)) {
+                        System.out.println("Player 1 won!");
+                    } else {
+                        System.out.println("fleet empty Doesn't work");
+                    }
+                }
             }
-         }
-      }
-      return true;
-   }
+        }
+    }
+    
+    /**
+     * Starts the game by initializing the current player, setting up the fleets,
+     * and attaching the necessary event listeners to the display grids.
+     */
+    public void run() {
+        currentPlayer = player1;
+        
+        player1.setFleet(d1.getPlayerGrid().getShips());
+        player2.setFleet(d2.getPlayerGrid().getShips());
+                           
+        addBoardEventListeners(player1, d1.getTargetGrid(), d2.getPlayerGrid());
+        addBoardEventListeners(player2, d2.getTargetGrid(), d1.getPlayerGrid());
+        
+        isReadyEventListener();
+    }
+    
+    /**
+     * Executes the game run when both players are ready.
+     * It sets up the ship positions on the target grids based on the players' ship placements
+     * and disables the start buttons to prevent reinitialization.
+     */
+    public void gameRun() {
+        if (d1.getIsReady() && d2.getIsReady()) {
+            setUpShips(d1.getPlayerGrid(), d2.getTargetGrid());
+            setUpShips(d2.getPlayerGrid(), d1.getTargetGrid());
+            d1.getStart().setEnabled(false);
+            d2.getStart().setEnabled(false);
+        }
+    }
+    
+    /**
+     * Attaches action listeners to the start buttons for both displays.
+     * When activated, these listeners call the gameRun method to begin the game.
+     */
+    public void isReadyEventListener() {
+        d1.getStart().addActionListener(e -> gameRun());
+        d2.getStart().addActionListener(e -> gameRun());
+    }
+    
+    /**
+     * Attaches board event listeners for the specified player.
+     * For each corresponding square in the opponent's grid and the player's own grid,
+     * an action listener is added. When a square is clicked, if it is the player's turn
+     * and both displays are ready, the method processes a hit on both squares, switches
+     * the current player, and checks if any ship has sunk.
+     *
+     * @param p      The player associated with these event listeners.
+     * @param opGrid The opponent's grid where hits are processed.
+     * @param pGrid  The player's grid that provides additional feedback for the hit.
+     */
+    public void addBoardEventListeners(Player p, Grid opGrid, Grid pGrid) {        
+        Square[][] opBoard = opGrid.getBoard();
+        Square[][] pBoard = pGrid.getBoard();
+             
+        for (int row = 0; row < opBoard.length; row++) {
+            for (int col = 0; col < opBoard[0].length; col++) {
+                Square opSquare = opBoard[row][col];
+                Square pSquare = pBoard[row][col];
    
-   private void player1Turn(){
-      if(player1Display.getISReady()){
-         
-      }
-      else{
-         return;
-      }
-   }
-   
-   private void player2Turn(){
-   
-   }
-   
-   /*
-    * Starts the game of Battleship.
-    */
-   public void startGame(){
-      for(Square[] row : player1Display.getTargetGrid().getBoard()){
-         for(Square space : row){
-            int xPos = space.getPositionX();
-            int yPos = space.getPositionY();
-            
-            player1Display.getTargetGrid().
-         }
-      }
-      while(!(isGameOver)){
-       
-       }
-   }
-   
+                opSquare.addActionListener(new ActionListener() { 
+                    public void actionPerformed(ActionEvent e) {
+                        if (p == currentPlayer && d1.getIsReady() && d2.getIsReady()) {
+                            sendHit(opSquare);
+                            sendHit(pSquare);
+                                                
+                            if (currentPlayer == player1) {
+                                currentPlayer = player2;
+                            } else {
+                                currentPlayer = player1;
+                            }
+                            
+                            checkIfShipSunk();
+                        }                   
+                    } 
+                });
+            }
+        }      
+    }
+                 
+    /**
+     * Sets up ships on the given opponent grid based on the player's grid.
+     * For each square in the player's grid that contains a ship, the method marks the corresponding
+     * square on the opponent's target grid as containing a ship.
+     *
+     * @param pGrid  The grid with the player's ship placements.
+     * @param opGrid The opponent's grid that will reflect the ship positions.
+     */
+    public void setUpShips(Grid pGrid, Grid opGrid) {
+        for (int row = 0; row < pGrid.getRow(); row++) {
+            for (int col = 0; col < pGrid.getCol(); col++) {
+                Square square = pGrid.getSquare(row, col);
+                  
+                if ("ship".equals(square.getType())) {
+                    opGrid.getSquare(row, col).setType("ship");
+                }
+            }
+        }
+    }
 }

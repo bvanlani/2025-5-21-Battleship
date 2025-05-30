@@ -4,6 +4,7 @@
  */
 import javax.swing.*;
 import java.awt.*;
+import java.util.*;
 
 public class Grid extends JPanel {
     /** The 2D array representing the board grid. */
@@ -17,6 +18,8 @@ public class Grid extends JPanel {
 
     /** Size of each square tile in pixels. */
     private final int size = 20;
+    
+    private ArrayList<Battleship> ships;
 
     /**
      * Constructs a Grid object with the specified number of rows and columns.
@@ -31,6 +34,7 @@ public class Grid extends JPanel {
         setLayout(new GridLayout(rows, cols, 2, 2));
         setBackground(ColorPalette.getBackgroundColor());
         board = new Square[rows][cols];
+        ships = new ArrayList<Battleship>();
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -63,6 +67,14 @@ public class Grid extends JPanel {
     public Square[][] getBoard() {
         return board;
     }
+    
+    public int getRow(){
+      return rows;
+    }
+    
+    public int getCol(){
+      return cols;
+    }
 
     /**
      * Resets the grid by clearing the background color and enabling squares.
@@ -75,7 +87,7 @@ public class Grid extends JPanel {
             }
         }
     }
-
+    
     /**
      * Places ship tiles at the specified location and direction.
      *
@@ -86,13 +98,19 @@ public class Grid extends JPanel {
      * @param bs The Battleship object to track ship parts.
      */
     public void placeShipTiles(int startRow, int startCol, int length, Direction dir, Battleship bs) {
-        for (int i = 0; i < length; i++) {
-            int r = startRow + dir.dRow * i;
-            int c = startCol + dir.dCol * i;
+    
+    ships.add(bs);
+    for (int i = 0; i < length; i++) {
+        int r = startRow + dir.dRow * i;
+        int c = startCol + dir.dCol * i;
+        if (r >= 0 && r < rows && c >= 0 && c < cols) {
             board[r][c].setType("ship");
+            board[r][c].updateColor();
             bs.addShipPart(board[r][c]);
         }
     }
+}
+
 
     /**
      * Checks whether a ship can be placed at the specified location and direction.
@@ -112,5 +130,9 @@ public class Grid extends JPanel {
             if ("ship".equals(board[r][c].getType())) return false;
         }
         return true;
+    }
+    
+    public ArrayList<Battleship> getShips(){
+         return ships; 
     }
 }

@@ -12,13 +12,14 @@ public class Player {
    
    // Variables
    private static final int fleet_size = 5;
-   private Battleship[] fleet;
+   private ArrayList<Battleship> fleet = new ArrayList<Battleship>();
    private boolean is_turn;
    
    // Constructors
    public Player() {
-      this.fleet = new Battleship[5];
+      //this.fleet = new Battleship[5];
       this.is_turn = false;
+      //initializeFleet();
    }
    
    // Functions
@@ -28,7 +29,7 @@ public class Player {
    /*
    @return Battleship[] -> the current whole fleet
    */
-   public Battleship[] getFleet () {
+   public ArrayList<Battleship> getFleet () {
       return fleet;
    }
 
@@ -40,7 +41,7 @@ public class Player {
    public Battleship getIndexFleet (int index) {
       if (index < 0 || index > fleet_size - 1) return null;
       
-      return fleet[index];
+      return fleet.get(index);
    }
 
    /*
@@ -56,7 +57,7 @@ public class Player {
    /*
    @param Battleship[] in_fleet -> input fleet to set the current fleet
    */
-   public void setFleet (Battleship[] in_fleet) {
+   public void setFleet (ArrayList<Battleship> in_fleet) {
       fleet = in_fleet;
    }
 
@@ -68,7 +69,7 @@ public class Player {
    public void setIndexFleet (Battleship in_ship, int index){
       if (index < 0 || index > fleet_size - 1) return;
       
-      fleet[index] = in_ship;
+      fleet.set(index, in_ship);
    }
 
    // Sets turn state of player
@@ -79,10 +80,17 @@ public class Player {
       is_turn = state;
    }
    
-   // Standard Functions
-   // Initialize and setups fleet, might be deprecated
-   public void initializeFleet () {
-      ;
+   public void removeShip(Battleship ship){
+      if(fleet != null){
+         
+         for(int i = 0; i < fleet.size(); i++){
+         
+            if(fleet.get(i).equals(ship)){
+               fleet.remove(i);
+            }
+         
+         }
+         
+      }
    }
-
 }

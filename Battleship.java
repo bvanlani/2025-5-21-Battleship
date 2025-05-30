@@ -55,14 +55,15 @@ public class Battleship {
      * @return true if the battleship is sunk, false otherwise
      */
     public boolean checkIsSunk() {
-        if (isSunk) return isSunk;
 
-        if (shipParts.size() == 0) {
-            isSunk = true;
-            return isSunk;
+        for(int i = 0; i < shipParts.size(); i++){
+        //System.out.println(shipParts.get(i).getType());
+            if(shipParts.get(i).getIsHit() == false){
+               return false;
+            }
         }
-
-        return false;
+        
+        return true;
     }
 
     /**
@@ -90,5 +91,9 @@ public class Battleship {
      */
     public int getLength() {
         return length;
+    }
+    
+    public ArrayList<Square> getShipParts(){
+       return shipParts;
     }
 }

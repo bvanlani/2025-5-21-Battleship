@@ -78,7 +78,8 @@ public class Square extends JButton {
      * @return True when the square is hit.
      */
     public boolean hitSquare(Color color) {
-        updateColor();
+        //updateColor();
+        setBackground(color);
         setEnabled(false);
         isHit = true;
         return true;
@@ -99,18 +100,19 @@ public class Square extends JButton {
      * @param type The new type of the square.
      */
     public void setType(String type) {
-        this.squareType = type;
-        updateColor();
-    }
+       this.squareType = type;
+       //updateColor();
+   }
+
 
     /**
      * Updates the square's background color based on its type.
      */
     public void updateColor() {
         if (squareType.equals("ship")) {
-            setBackground(ColorPalette.SHIP);
+            setBackground(ColorPalette.getShipColor());
         } else if (squareType.equals("water")) {
-            setBackground(ColorPalette.WATER);
+            setBackground(ColorPalette.getWaterHit());
         }
     }
 
