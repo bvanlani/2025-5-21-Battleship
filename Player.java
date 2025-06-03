@@ -1,63 +1,59 @@
-import javax.swing.*;
-import java.awt.*;
-import java.util.*;
-import java.util.function.*;
+package dev.bvanlani.battleship;
 
-public class Player extends JFrame{
+import javax.swing.*;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.*;
+import java.rmi.*;
+
+public class Player extends UnicastRemoteObject implements PlayerInterface{
+
+   static Scanner scanner = new Scanner(System.in);
+
+   public static void main(String[] args) {
+      try{
+         System.out.print("Enter Server IP: ");
+         String IP = scanner.nextLine();
+
+
+         Registry registry = LocateRegistry.getRegistry(IP, 1234);
+         GameInterface gm = (GameInterface) registry.lookup("GameManager");
+
+
+         System.out.println("Connected to the server.\n");
+         System.out.print("Enter your name: ");
+         String name = scanner.nextLine();
+
+         Player player = new Player(name);
+
+      }catch(Exception e){
+            e.printStackTrace();
+      }
+   }
+
 
    // player variable
-   private ArrayList<Battleship> fleet = new ArrayList<Battleship>();
-   private String name;
+   private ArrayList<Battleship> fleet = new ArrayList<>();
+   private final String name;
    
    private final Grid playerGrid;
    private final Grid targetGrid;
    private final java.util.List<Battleship> shipsToPlace = new ArrayList<>();
    private Direction currentDirection = Direction.RIGHT;
-   private boolean placementPhase = true;
-   private JButton start;
    private boolean isReady = false;
-   private JPanel controlPanel;
-   private JButton rotateButton;
-   private JLabel shipLengthLabel;
-   private Consumer<JButton> onStartButtonCreated;
+   private final Display dis;
+   private GameManager gm;
    
-   public Player(String name){
+   public Player(String name) throws RemoteException {
+      super();
       this.name = name;
-      setTitle(name);
-      setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      setResizable(false);
-      setLayout(new BorderLayout());
      
       playerGrid = new Grid(10, 10);
       targetGrid = new Grid(10, 10);
-     
-      JPanel gridsPanel = new JPanel();
-      gridsPanel.setLayout(new BoxLayout(gridsPanel, BoxLayout.Y_AXIS));
-      gridsPanel.setBackground(ColorPalette.getBackgroundColor());
-     
-      gridsPanel.add(targetGrid);
-      gridsPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-      gridsPanel.add(playerGrid);
-      this.add(gridsPanel, BorderLayout.CENTER);
-           
-      rotateButton = new JButton("Rotate (" +currentDirection + ")");
-      rotateButton.addActionListener(e -> {
-         currentDirection = currentDirection.next();
-         rotateButton.setText("Rotate (" + currentDirection + ")");
-      });
-     
-      shipLengthLabel = new JLabel("-");
-      shipLengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
-     
-      controlPanel = new JPanel(new BorderLayout());
-      controlPanel.add(shipLengthLabel, BorderLayout.CENTER);
-      controlPanel.add(rotateButton, BorderLayout.WEST);
-     
-      this.add(controlPanel, BorderLayout.SOUTH);
-     
-      this.pack();
-      this.setVisible(true);
-     
+
+      this.dis = new Display(name, this);
+
       setupShipStorage();
    }
    
@@ -68,7 +64,7 @@ public class Player extends JFrame{
       shipsToPlace.add(new Battleship("Submarine", 3));
       shipsToPlace.add(new Battleship("Destroyer", 2));
      
-      shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
+      dis.setShipLengthLabel("" + shipsToPlace.get(0).getLength());
       enablePlacementMode();
    }
    
@@ -96,34 +92,36 @@ public class Player extends JFrame{
       }
      
       playerGrid.placeShipTiles(startRow, startCol, length, currentDirection, shipsToPlace.get(0));
+      shipsToPlace.get(0).setDirection(currentDirection);
       shipsToPlace.remove(0);
      
       if(shipsToPlace.isEmpty()){
-         placementPhase = false;
-         shipLengthLabel.setText("-");
-         
-         controlPanel.remove(shipLengthLabel);
-         controlPanel.remove(rotateButton);
-         
-         start = new JButton("Ready");
-         controlPanel.add(start, BorderLayout.CENTER);
-         
-         controlPanel.revalidate();
-         controlPanel.repaint();
 
-         if (onStartButtonCreated != null) onStartButtonCreated.accept(start);
-   
+         dis.readyState();
+
       }else{
-         shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
+         dis.setShipLengthLabel("" + shipsToPlace.get(0).getLength());
       }
    }
-  
-   public java.util.List<Battleship> getShipsToPlace(){
-      return shipsToPlace;
+
+   public void setGM(GameManager gm) {
+      this.gm = gm;
    }
-   
-   public JButton getStart(){
-      return start;
+
+   public void setTargetSquareType(int row, int col, String type) {
+      targetGrid.setSquare(row, col, type);
+   }
+
+   public String getPlayerSquareType(int row, int col) {
+      return playerGrid.getSquare(row, col).getType();
+   }
+
+   public String getName(){
+        return name;
+   }
+
+   public void gameRun(){
+      gm.gameRun(this);
    }
    
    public boolean getIsReady(){
@@ -141,9 +139,17 @@ public class Player extends JFrame{
    public void setIsReady(boolean isReady){
       this.isReady = isReady;
    }
-   
-   public int getGridRow(){
-      return playerGrid.getRow();
+
+   public Direction getDirection(){
+      return currentDirection;
+   }
+
+   public void setDirection(Direction dir){
+        this.currentDirection = dir;
+   }
+
+   public Display getDisplay(){
+      return dis;
    }
    
    // Player Methods
@@ -156,7 +162,7 @@ public class Player extends JFrame{
       return fleet;
    }
    
-   // Sets the whole fleet with an inputed fleet
+   // Sets the whole fleet with an inputted fleet
    /*
    @param Battleship[] in_fleet -> input fleet to set the current fleet
    */
@@ -165,20 +171,72 @@ public class Player extends JFrame{
    }
    
    public void removeShip(Battleship ship){
-      if(fleet != null){
-         
-         for(int i = 0; i < fleet.size(); i++){
-         
-            if(fleet.get(i).equals(ship)){
-               fleet.remove(i);
-            }
-         
+      fleet.remove(ship);
+   }
+
+   public void initializeFleet(){
+      setFleet(playerGrid.getShips());
+   }
+
+   public int fleetSize(){
+      return fleet.size();
+   }
+
+   public void addBoardEventListeners(){
+      Square[][] opBoard = targetGrid.getBoard();
+
+      for (int row = 0; row < opBoard.length; row++) {
+         for (int col = 0; col < opBoard[0].length; col++) {
+            Square opSquare = opBoard[row][col];
+
+            opSquare.addActionListener(e -> {
+               if(gm.getCurrentPlayer() == this) {
+                  gm.callHit(opSquare.getPositionX(), opSquare.getPositionY());
+               }
+            });
          }
-         
       }
    }
-   
-   public void setOnStartButtonCreated(Consumer<JButton> listener) {
-      this.onStartButtonCreated = listener;
+
+
+   public void receivePlayerHit(int row, int col){
+      playerGrid.getSquare(row, col).hitSquare();
+      checkIfShipSunk();
+   }
+
+   public void receiveTargetHit(int row, int col){
+      targetGrid.getSquare(row, col).hitSquare();
+   }
+
+   public void checkIfShipSunk(){
+       for (int i=fleet.size()-1;i>=0;i--) {
+
+           if (fleet.get(i).checkIsSunk()) {
+               ArrayList<Square> shipSquares = fleet.get(i).getShipParts();
+
+               for (Square shipSquare : shipSquares) {
+                   shipSquare.setType("sunk");
+               }
+
+               gm.sinkBattleship(this, fleet.get(i).getLength(), fleet.get(i).getDirection(), fleet.get(i).getStartX(), fleet.get(i).getStartY());
+
+               removeShip(fleet.get(i));
+
+               gm.checkWin();
+           }
+       }
+   }
+
+   public void sinkBattleship(int length, Direction dir, int startX, int startY) {
+      int x = startX;
+      int y = startY;
+
+      for(int i = 0; i < length; i++) {
+
+         targetGrid.getSquare(x, y).setType("sunk");
+
+         x += dir.dRow;
+         y += dir.dCol;
+      }
    }
 }

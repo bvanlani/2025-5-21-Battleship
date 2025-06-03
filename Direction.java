@@ -1,3 +1,5 @@
+package dev.bvanlani.battleship;
+
 public enum Direction{
    UP(-1, 0),
    DOWN(1,0),

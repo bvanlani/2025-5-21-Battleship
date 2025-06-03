@@ -1,3 +1,5 @@
+package dev.bvanlani.battleship;
+
 import java.util.*;
 
 /**
@@ -10,14 +12,14 @@ public class Battleship {
     /** The length of the battleship, indicating the number of squares it occupies. */
     private final int length;
 
-    /** Indicates whether the battleship has been sunk. */
-    private boolean isSunk;
-
     /** The list of squares occupied by the battleship. */
-    private ArrayList<Square> shipParts;
+    private final ArrayList<Square> shipParts;
 
     /** The direction in which the battleship is oriented. */
     private Direction dir;
+
+    private int startX;
+    private int startY;
 
     /**
      * Constructs a Battleship with the specified name and length.
@@ -32,47 +34,20 @@ public class Battleship {
     }
 
     /**
-     * Sets the direction of the battleship.
-     *
-     * @param dir the direction to set for the battleship
-     */
-    public void setDirection(Direction dir) {
-        this.dir = dir;
-    }
-
-    /**
-     * Retrieves the direction of the battleship.
-     *
-     * @return the direction of the battleship
-     */
-    public Direction getDirection() {
-        return dir;
-    }
-
-    /**
      * Checks if the battleship is sunk. A ship is considered sunk if it has no parts or has been marked as sunk.
      *
      * @return true if the battleship is sunk, false otherwise
      */
     public boolean checkIsSunk() {
 
-        for(int i = 0; i < shipParts.size(); i++){
-        //System.out.println(shipParts.get(i).getType());
-            if(shipParts.get(i).getIsHit() == false){
-               return false;
+        for (Square shipPart : shipParts) {
+            //System.out.println(shipParts.get(i).getType());
+            if (!shipPart.getIsHit()) {
+                return false;
             }
         }
         
         return true;
-    }
-
-    /**
-     * Removes a specific ship part from the battleship.
-     *
-     * @param shipPart the square to remove from the battleship's parts
-     */
-    public void removeShipPart(Square shipPart) {
-        shipParts.remove(shipParts.indexOf(shipPart));
     }
 
     /**
@@ -81,6 +56,11 @@ public class Battleship {
      * @param shipPart the square to add to the battleship's parts
      */
     public void addShipPart(Square shipPart) {
+        if(shipParts.isEmpty()){
+            startX = shipPart.getPositionX();
+            startY = shipPart.getPositionY();
+        }
+
         shipParts.add(shipPart);
     }
 
@@ -95,5 +75,21 @@ public class Battleship {
     
     public ArrayList<Square> getShipParts(){
        return shipParts;
+    }
+
+    public Direction getDirection() {
+        return dir;
+    }
+
+    public int getStartX(){
+        return startX;
+    }
+
+    public int getStartY(){
+        return startY;
+    }
+
+    public void setDirection(Direction dir) {
+        this.dir = dir;
     }
 }

@@ -1,3 +1,5 @@
+package dev.bvanlani.battleship;
+
 import javax.swing.JButton;
 import java.awt.Color;
 
@@ -61,31 +63,6 @@ public class Square extends JButton {
     }
 
     /**
-     * Marks the square as hit, disabling the button.
-     *
-     * @return True when the square is hit.
-     */
-    public boolean hitSquare() {
-        setEnabled(false);
-        isHit = true;
-        return true;
-    }
-
-    /**
-     * Marks the square as hit and updates its color.
-     *
-     * @param color The new color of the square.
-     * @return True when the square is hit.
-     */
-    public boolean hitSquare(Color color) {
-        //updateColor();
-        setBackground(color);
-        setEnabled(false);
-        isHit = true;
-        return true;
-    }
-
-    /**
      * Gets the type of the square.
      *
      * @return The type of the square.
@@ -101,6 +78,25 @@ public class Square extends JButton {
      */
     public void setType(String type) {
        this.squareType = type;
+       switch(type){
+           case "ship":
+               setBackground(ColorPalette.getShipColor());
+               break;
+           case "water", "enemy_ship":
+               setBackground(ColorPalette.getWaterColor());
+               break;
+           case "miss":
+               setBackground(ColorPalette.getWaterHit());
+               break;
+           case "sunk":
+               setBackground(ColorPalette.getSunkShip());
+               break;
+           case "flag":
+                setBackground(ColorPalette.getFlagColor());
+                isHit = true;
+                removeActionListener(null);
+                break;
+       }
        //updateColor();
    }
 
@@ -108,20 +104,14 @@ public class Square extends JButton {
     /**
      * Updates the square's background color based on its type.
      */
-    public void updateColor() {
-        if (squareType.equals("ship")) {
-            setBackground(ColorPalette.getShipColor());
-        } else if (squareType.equals("water")) {
-            setBackground(ColorPalette.getWaterHit());
+    public void hitSquare() {
+        switch(squareType) {
+            case "ship", "enemy_ship":
+                setType("flag");
+                break;
+            case "water":
+                setType("miss");
+                break;
         }
-    }
-
-    /**
-     * Gets the current background color of the square.
-     *
-     * @return The current color.
-     */
-    public Color getCurrentColor() {
-        return getBackground();
     }
 }

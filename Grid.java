@@ -1,4 +1,4 @@
-/**
+package dev.bvanlani.battleship; /**
  * The Grid class represents a game board for a battleship-style game.
  * It is a JPanel that holds a grid of Square objects.
  */
@@ -76,6 +76,10 @@ public class Grid extends JPanel {
       return cols;
     }
 
+    public void setSquare(int row, int col, String type) {
+        board[row][col].setType(type);
+    }
+
     /**
      * Resets the grid by clearing the background color and enabling squares.
      */
@@ -105,7 +109,6 @@ public class Grid extends JPanel {
         int c = startCol + dir.dCol * i;
         if (r >= 0 && r < rows && c >= 0 && c < cols) {
             board[r][c].setType("ship");
-            board[r][c].updateColor();
             bs.addShipPart(board[r][c]);
         }
     }
