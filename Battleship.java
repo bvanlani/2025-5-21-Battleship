@@ -1,5 +1,3 @@
-package dev.bvanlani.battleship;
-
 import java.util.*;
 
 /**
@@ -18,7 +16,10 @@ public class Battleship {
     /** The direction in which the battleship is oriented. */
     private Direction dir;
 
+    /** The starting X (column) coordinate of the battleship. */
     private int startX;
+
+    /** The starting Y (row) coordinate of the battleship. */
     private int startY;
 
     /**
@@ -34,33 +35,31 @@ public class Battleship {
     }
 
     /**
-     * Checks if the battleship is sunk. A ship is considered sunk if it has no parts or has been marked as sunk.
+     * Checks if the battleship is sunk.
+     * A ship is considered sunk if all of its parts have been hit.
      *
      * @return true if the battleship is sunk, false otherwise
      */
     public boolean checkIsSunk() {
-
         for (Square shipPart : shipParts) {
-            //System.out.println(shipParts.get(i).getType());
             if (!shipPart.getIsHit()) {
                 return false;
             }
         }
-        
         return true;
     }
 
     /**
-     * Adds a ship part to the battleship.
+     * Adds a ship part (Square) to the battleship.
+     * Also sets the starting coordinates if this is the first part added.
      *
      * @param shipPart the square to add to the battleship's parts
      */
     public void addShipPart(Square shipPart) {
-        if(shipParts.isEmpty()){
+        if (shipParts.isEmpty()) {
             startX = shipPart.getPositionX();
             startY = shipPart.getPositionY();
         }
-
         shipParts.add(shipPart);
     }
 
@@ -72,23 +71,48 @@ public class Battleship {
     public int getLength() {
         return length;
     }
-    
-    public ArrayList<Square> getShipParts(){
-       return shipParts;
+
+    /**
+     * Returns the list of squares that make up the battleship.
+     *
+     * @return the list of ship parts
+     */
+    public ArrayList<Square> getShipParts() {
+        return shipParts;
     }
 
+    /**
+     * Returns the direction in which the battleship is oriented.
+     *
+     * @return the direction of the battleship
+     */
     public Direction getDirection() {
         return dir;
     }
 
-    public int getStartX(){
+    /**
+     * Returns the starting X (column) coordinate of the battleship.
+     *
+     * @return the starting X coordinate
+     */
+    public int getStartX() {
         return startX;
     }
 
-    public int getStartY(){
+    /**
+     * Returns the starting Y (row) coordinate of the battleship.
+     *
+     * @return the starting Y coordinate
+     */
+    public int getStartY() {
         return startY;
     }
 
+    /**
+     * Sets the direction of the battleship.
+     *
+     * @param dir the direction to set
+     */
     public void setDirection(Direction dir) {
         this.dir = dir;
     }

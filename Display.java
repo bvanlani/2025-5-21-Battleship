@@ -1,5 +1,3 @@
-package dev.bvanlani.battleship;
-
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
@@ -57,9 +55,21 @@ public class Display extends JFrame{
     public JButton getStart(){
         return start;
     }
+    
+    public void setStartText(String text){
+      start.setText(text);
+    }
+    
+    public String getStartText(){
+      return start.getText();
+    }
 
     public void setShipLengthLabel(String text){
         shipLengthLabel.setText(text);
+    }
+    
+    public String getShipLengthLabel(){
+        return shipLengthLabel.getText();
     }
 
     public void readyState(){

@@ -1,5 +1,3 @@
-package dev.bvanlani.battleship;
-
 import java.rmi.*;
 
 public interface PlayerInterface extends Remote {
@@ -13,4 +11,5 @@ public interface PlayerInterface extends Remote {
     void sinkBattleship(int length, Direction dir, int x, int y) throws RemoteException;
     int fleetSize() throws RemoteException;
     String getName() throws RemoteException;
+    void setIsReady(boolean ready) throws RemoteException;
 }

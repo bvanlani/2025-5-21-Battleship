@@ -1,5 +1,3 @@
-package dev.bvanlani.battleship;
-
 import java.awt.Color;
 
 public final class ColorPalette{

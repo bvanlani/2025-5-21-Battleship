@@ -1,11 +1,11 @@
-package dev.bvanlani.battleship; /**
- * The Grid class represents a game board for a battleship-style game.
- * It is a JPanel that holds a grid of Square objects.
- */
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
 
+/**
+ * The Grid class represents a game board for a battleship-style game.
+ * It extends JPanel and contains a 2D array of Square objects.
+ */
 public class Grid extends JPanel {
     /** The 2D array representing the board grid. */
     private final Square[][] board;
@@ -18,7 +18,8 @@ public class Grid extends JPanel {
 
     /** Size of each square tile in pixels. */
     private final int size = 20;
-    
+
+    /** List of battleships placed on the grid. */
     private ArrayList<Battleship> ships;
 
     /**
@@ -34,7 +35,7 @@ public class Grid extends JPanel {
         setLayout(new GridLayout(rows, cols, 2, 2));
         setBackground(ColorPalette.getBackgroundColor());
         board = new Square[rows][cols];
-        ships = new ArrayList<Battleship>();
+        ships = new ArrayList<>();
 
         for (int r = 0; r < rows; r++) {
             for (int c = 0; c < cols; c++) {
@@ -67,21 +68,38 @@ public class Grid extends JPanel {
     public Square[][] getBoard() {
         return board;
     }
-    
-    public int getRow(){
-      return rows;
-    }
-    
-    public int getCol(){
-      return cols;
+
+    /**
+     * Returns the number of rows in the grid.
+     *
+     * @return The number of rows.
+     */
+    public int getRow() {
+        return rows;
     }
 
+    /**
+     * Returns the number of columns in the grid.
+     *
+     * @return The number of columns.
+     */
+    public int getCol() {
+        return cols;
+    }
+
+    /**
+     * Sets the type of a square at the specified position.
+     *
+     * @param row The row index.
+     * @param col The column index.
+     * @param type The type to set (e.g., "ship", "water").
+     */
     public void setSquare(int row, int col, String type) {
         board[row][col].setType(type);
     }
 
     /**
-     * Resets the grid by clearing the background color and enabling squares.
+     * Resets the grid by clearing the background color and enabling all squares.
      */
     public void resetGrid() {
         for (JButton[] row : board) {
@@ -91,9 +109,10 @@ public class Grid extends JPanel {
             }
         }
     }
-    
+
     /**
      * Places ship tiles at the specified location and direction.
+     * Updates the board and the Battleship object with the ship parts.
      *
      * @param startRow The starting row index.
      * @param startCol The starting column index.
@@ -102,18 +121,16 @@ public class Grid extends JPanel {
      * @param bs The Battleship object to track ship parts.
      */
     public void placeShipTiles(int startRow, int startCol, int length, Direction dir, Battleship bs) {
-    
-    ships.add(bs);
-    for (int i = 0; i < length; i++) {
-        int r = startRow + dir.dRow * i;
-        int c = startCol + dir.dCol * i;
-        if (r >= 0 && r < rows && c >= 0 && c < cols) {
-            board[r][c].setType("ship");
-            bs.addShipPart(board[r][c]);
+        ships.add(bs);
+        for (int i = 0; i < length; i++) {
+            int r = startRow + dir.dRow * i;
+            int c = startCol + dir.dCol * i;
+            if (r >= 0 && r < rows && c >= 0 && c < cols) {
+                board[r][c].setType("ship");
+                bs.addShipPart(board[r][c]);
+            }
         }
     }
-}
-
 
     /**
      * Checks whether a ship can be placed at the specified location and direction.
@@ -134,8 +151,13 @@ public class Grid extends JPanel {
         }
         return true;
     }
-    
-    public ArrayList<Battleship> getShips(){
-         return ships; 
+
+    /**
+     * Returns the list of Battleship objects placed on the grid.
+     *
+     * @return The list of ships.
+     */
+    public ArrayList<Battleship> getShips() {
+        return ships;
     }
 }
