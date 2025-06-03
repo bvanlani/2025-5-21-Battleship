@@ -104,8 +104,12 @@ public class GameManager {
                 if (fleet.isEmpty()) {
                     if (currentPlayer.equals(p1)) {
                         System.out.println("Player 2 won!");
+                        p1.dispatchEvent(new WindowEvent(p1, WindowEvent.WINDOW_CLOSING));
+                        p2.dispatchEvent(new WindowEvent(p2, WindowEvent.WINDOW_CLOSING));
                     } else if (currentPlayer.equals(p2)) {
                         System.out.println("Player 1 won!");
+                        p1.dispatchEvent(new WindowEvent(p1, WindowEvent.WINDOW_CLOSING));
+                        p2.dispatchEvent(new WindowEvent(p2, WindowEvent.WINDOW_CLOSING));
                     } else {
                         System.out.println("fleet empty Doesn't work");
                     }
@@ -127,7 +131,9 @@ public class GameManager {
         addBoardEventListeners(p1, p1.getTargetGrid(), p2.getPlayerGrid());
         addBoardEventListeners(p2, p2.getTargetGrid(), p1.getPlayerGrid());
         
-        isReadyEventListener();
+        p1.setOnStartButtonCreated(button -> button.addActionListener(e -> gameRun(p1)));
+        p2.setOnStartButtonCreated(button -> button.addActionListener(e -> gameRun(p2)));
+
     }
     
     /**
@@ -135,22 +141,13 @@ public class GameManager {
      * It sets up the ship positions on the target grids based on the players' ship placements
      * and disables the start buttons to prevent reinitialization.
      */
-    public void gameRun() {
+    public void gameRun(Player p) {
+        p.setIsReady(true);
+        p.getStart().setEnabled(false);
         if (p1.getIsReady() && p2.getIsReady()) {
-            setUpShips(p1.getPlayerGrid(), p2.getTargetGrid());
-            setUpShips(p2.getPlayerGrid(), p1.getTargetGrid());
-            p1.getStart().setEnabled(false);
-            p2.getStart().setEnabled(false);
+            setUpShips(p1, p2);
+            setUpShips(p2, p1);
         }
-    }
-    
-    /**
-     * Attaches action listeners to the start buttons for both displays.
-     * When activated, these listeners call the gameRun method to begin the game.
-     */
-    public void isReadyEventListener() {
-        p1.getStart().addActionListener(e -> gameRun());
-        p2.getStart().addActionListener(e -> gameRun());
     }
     
     /**
@@ -201,13 +198,13 @@ public class GameManager {
      * @param pGrid  The grid with the player's ship placements.
      * @param opGrid The opponent's grid that will reflect the ship positions.
      */
-    public void setUpShips(Grid pGrid, Grid opGrid) {
-        for (int row = 0; row < pGrid.getRow(); row++) {
-            for (int col = 0; col < pGrid.getCol(); col++) {
-                Square square = pGrid.getSquare(row, col);
+    public void setUpShips(Player p, Player op) {
+        for (int row = 0; row < p.getGridRow(); row++) {
+            for (int col = 0; col < p.getGridCol(); col++) {
+                Square square = p.getGridSquare(row, col);
                   
                 if ("ship".equals(square.getType())) {
-                    opGrid.getSquare(row, col).setType("ship");
+                    op.getGridSquare(row, col).setType("ship");
                 }
             }
         }

@@ -1,26 +1,31 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.*;
+import java.util.function.*;
 
 public class Player extends JFrame{
 
    // player variable
    private ArrayList<Battleship> fleet = new ArrayList<Battleship>();
+   private String name;
    
    private final Grid playerGrid;
    private final Grid targetGrid;
    private final java.util.List<Battleship> shipsToPlace = new ArrayList<>();
    private Direction currentDirection = Direction.RIGHT;
    private boolean placementPhase = true;
-   private JLabel shipLengthLabel;
    private JButton start;
    private boolean isReady = false;
-   
-   private final Color background = new Color(17, 17, 17);
+   private JPanel controlPanel;
+   private JButton rotateButton;
+   private JLabel shipLengthLabel;
+   private Consumer<JButton> onStartButtonCreated;
    
    public Player(String name){
+      this.name = name;
       setTitle(name);
       setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+      setResizable(false);
       setLayout(new BorderLayout());
      
       playerGrid = new Grid(10, 10);
@@ -35,7 +40,7 @@ public class Player extends JFrame{
       gridsPanel.add(playerGrid);
       this.add(gridsPanel, BorderLayout.CENTER);
            
-      JButton rotateButton = new JButton("Rotate (" +currentDirection + ")");
+      rotateButton = new JButton("Rotate (" +currentDirection + ")");
       rotateButton.addActionListener(e -> {
          currentDirection = currentDirection.next();
          rotateButton.setText("Rotate (" + currentDirection + ")");
@@ -44,12 +49,9 @@ public class Player extends JFrame{
       shipLengthLabel = new JLabel("-");
       shipLengthLabel.setHorizontalAlignment(SwingConstants.CENTER);
      
-      JPanel controlPanel = new JPanel(new BorderLayout());
+      controlPanel = new JPanel(new BorderLayout());
       controlPanel.add(shipLengthLabel, BorderLayout.CENTER);
       controlPanel.add(rotateButton, BorderLayout.WEST);
-      
-      this.start = new JButton("Start");
-      controlPanel.add(start, BorderLayout.EAST);
      
       this.add(controlPanel, BorderLayout.SOUTH);
      
@@ -100,10 +102,17 @@ public class Player extends JFrame{
          placementPhase = false;
          shipLengthLabel.setText("-");
          
-         start.addActionListener(e -> {
-            isReady = true;
-         });
-      
+         controlPanel.remove(shipLengthLabel);
+         controlPanel.remove(rotateButton);
+         
+         start = new JButton("Ready");
+         controlPanel.add(start, BorderLayout.CENTER);
+         
+         controlPanel.revalidate();
+         controlPanel.repaint();
+
+         if (onStartButtonCreated != null) onStartButtonCreated.accept(start);
+   
       }else{
          shipLengthLabel.setText("" + shipsToPlace.get(0).getLength());
       }
@@ -127,6 +136,14 @@ public class Player extends JFrame{
    
    public Grid getTargetGrid(){
       return targetGrid;
+   }
+   
+   public void setIsReady(boolean isReady){
+      this.isReady = isReady;
+   }
+   
+   public int getGridRow(){
+      return playerGrid.getRow();
    }
    
    // Player Methods
@@ -161,4 +178,7 @@ public class Player extends JFrame{
       }
    }
    
+   public void setOnStartButtonCreated(Consumer<JButton> listener) {
+      this.onStartButtonCreated = listener;
+   }
 }
