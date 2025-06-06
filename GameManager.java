@@ -86,9 +86,11 @@ public class GameManager implements GameInterface {
      */
     public void callHit(int row, int col) {
         try {
+            currentPlayer.receiveTargetHit(row, col);
+        
             PlayerInterface defender = (currentPlayer == p1) ? p2 : p1;
             defender.receivePlayerHit(row, col);
-            currentPlayer.receiveTargetHit(row, col);
+
             currentPlayer = (currentPlayer == p1) ? p2 : p1;
             //System.out.println("Sent hit to "+ currentPlayer + " at ("+row+","+col+")");
         } catch (Exception e) {
@@ -198,10 +200,12 @@ public class GameManager implements GameInterface {
     public void checkWin() {
         try {
             if (p1.fleetSize() == 0) {
-                System.out.print("Player 2 wins!");
+               p2.win();
+               p1.lose();
             }
             if (p2.fleetSize() == 0) {
-                System.out.print("Player 1 wins!");
+                p1.win();
+                p2.lose();
             }
         } catch (Exception e) {
             e.printStackTrace();

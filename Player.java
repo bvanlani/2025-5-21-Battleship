@@ -4,6 +4,7 @@ import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.rmi.*;
+import java.awt.event.ActionListener;
 
 /**
  * Represents a player in the Battleship game.
@@ -258,12 +259,8 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
                             //System.out.println(x+"," +y);
                             if (p.getCurrentPlayer().equals(p.getName())) {
                                 p.callHit(x, y);
+                                opSquare.removeActionListener(opSquare.getActionListeners()[0]);
                             }
-                            if(p.getDisplay().getStartText().equals("Opponents Turn")){
-                                   p.getDisplay().setStartText("Your turn");
-                                }else{
-                                   p.getDisplay().setStartText("Opponents Turn");
-                                }
                         } catch (Exception t) {
                             t.printStackTrace();
                         }
@@ -285,6 +282,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
      */
     public void receivePlayerHit(int row, int col) {
         playerGrid.getSquare(row, col).hitSquare();
+        dis.setStartText("Your Turn");
         checkIfShipSunk();
     }
 
@@ -296,6 +294,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
      */
     public void receiveTargetHit(int row, int col) {
         targetGrid.getSquare(row, col).hitSquare();
+        dis.setStartText("Opponents Turn");
     }
 
     /** Checks if any ship in the fleet has been sunk and updates the game state. */
@@ -309,8 +308,7 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
                         shipSquare.setType("sunk");
                     }
 
-                    gm.sinkBattleship((PlayerInterface)this, fleet.get(i).getLength(), fleet.get(i).getDirection(),
-                            fleet.get(i).getStartX(), fleet.get(i).getStartY());
+                    gm.sinkBattleship((PlayerInterface)this, fleet.get(i).getLength(), fleet.get(i).getDirection(),fleet.get(i).getStartX(), fleet.get(i).getStartY());
 
                     removeShip(fleet.get(i));
                     gm.checkWin();
@@ -341,15 +339,27 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
         }
     }
     
-    @Override
-   public boolean equals(Object obj) {
-       if (this == obj) return true; // same reference
-       if (obj == null || getClass() != obj.getClass()) return false; // null or different class
-   
-       Player other = (Player) obj;
-   
-       // Compare relevant fields (adjust based on your class)
-       return Objects.equals(this.name, other.getName()); // assuming playerId uniquely identifies a player
-   }
-
+    public void clearEventListeners(){
+      Square[][] opBoard = targetGrid.getBoard();
+         for (int row = 0; row < opBoard.length; row++) {
+             for (int col = 0; col < opBoard[0].length; col++) {
+               for (ActionListener al : opBoard[row][col].getActionListeners()) {
+                  opBoard[row][col].removeActionListener(al);
+                  if(opBoard[row][col].getType().equals("enemy_ship")){
+                     opBoard[row][col].setType("ship");
+                  }
+               }
+             }
+         }
+    }
+    
+    public void win(){
+      clearEventListeners();
+      getDisplay().setStartText("You won!");
+    }
+    
+    public void lose(){
+      clearEventListeners();
+      getDisplay().setStartText("You lost");
+    }
 }

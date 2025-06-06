@@ -12,4 +12,6 @@ public interface PlayerInterface extends Remote {
     int fleetSize() throws RemoteException;
     String getName() throws RemoteException;
     void setIsReady(boolean ready) throws RemoteException;
+    void win() throws RemoteException;
+    void lose() throws RemoteException;
 }
