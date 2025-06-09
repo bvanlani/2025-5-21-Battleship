@@ -11,6 +11,7 @@ public class Display extends JFrame{
     private JButton start;
     private JPanel controlPanel;
     private JButton rotateButton;
+    private JButton reset;
     private JLabel shipLengthLabel;
 
     private final Player player;
@@ -81,7 +82,7 @@ public class Display extends JFrame{
         start.addActionListener(e -> {
             player.gameRun();
             start.setEnabled(false);
-            start.setText("Ready");
+            start.setText("Waiting...");
         });
 
         controlPanel.add(start, BorderLayout.CENTER);
@@ -89,5 +90,24 @@ public class Display extends JFrame{
         controlPanel.repaint();
 
     }
-
+    
+    public void endState(String result){
+      controlPanel.remove(start);
+      
+     //  reset = new JButton("Reset");
+//       
+//       reset.addActionListener(e ->{
+//          player.reset();
+//          setEnabled(false);
+//       });
+      
+      setShipLengthLabel(result);
+      
+      // controlPanel.add(reset, BorderLayout.EAST);
+      controlPanel.add(shipLengthLabel, BorderLayout.CENTER);
+      
+      controlPanel.revalidate();
+      controlPanel.repaint();
+      
+    }
 }

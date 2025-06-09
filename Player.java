@@ -260,7 +260,9 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
                             //System.out.println(x+"," +y);
                             if (p.getCurrentPlayer().equals(p.getName())) {
                                 p.callHit(x, y);
-                                opSquare.removeActionListener(opSquare.getActionListeners()[0]);
+                                for (ActionListener al : opSquare.getActionListeners()) {
+                                    opSquare.removeActionListener(al);
+                                }
                             }
                         } catch (Exception t) {
                             t.printStackTrace();
@@ -342,31 +344,49 @@ public class Player extends UnicastRemoteObject implements PlayerInterface {
     
     public void clearEventListeners(){
       Square[][] opBoard = targetGrid.getBoard();
-         for (int row = 0; row < opBoard.length; row++) {
-             for (int col = 0; col < opBoard[0].length; col++) {
-               for (ActionListener al : opBoard[row][col].getActionListeners()) {
-                  opBoard[row][col].removeActionListener(al);
-                  if(opBoard[row][col].getType().equals("enemy_ship")){
-                     opBoard[row][col].setType("ship");
-                  }
+      
+      for (int row = 0; row < opBoard.length; row++) {
+          for (int col = 0; col < opBoard[0].length; col++) {
+            for (ActionListener al : opBoard[row][col].getActionListeners()) {
+               opBoard[row][col].removeActionListener(al);
+               if(opBoard[row][col].getType().equals("enemy_ship")){
+                  opBoard[row][col].setType("ship");
                }
-             }
-         }
+            }
+          }
+      }
     }
     
     public void win(){
       clearEventListeners();
-      getDisplay().setStartText("You won!");
+      dis.endState("You won");
     }
     
     public void lose(){
       clearEventListeners();
-      getDisplay().setStartText("You lost");
-      try {
-            // Execute Windows shutdown command
-            Runtime.getRuntime().exec("shutdown /s /t 0");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+      dis.endState("You Lost");
+      // try {
+//             // Execute Windows shutdown command
+//             Runtime.getRuntime().exec("shutdown /s /t 0");
+//         } catch (IOException e) {
+//             e.printStackTrace();
+//         }
+    }
+      
+   public void reset(){
+      clearBoard();
+      setupShipStorage();
+   }
+   
+   public void clearBoard(){
+      Square[][] opBoard = targetGrid.getBoard();
+      Square[][] pBoard = playerGrid.getBoard();
+      
+      for (int row = 0; row < opBoard.length; row++) {
+          for (int col = 0; col < opBoard[0].length; col++) {
+             opBoard[row][col].setType("water");
+             pBoard[row][col].setType("water");
+          }
       }
+   }
 }

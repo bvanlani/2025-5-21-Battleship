@@ -122,10 +122,12 @@ public class GameManager implements GameInterface {
     public void gameRun(PlayerInterface p) {
         try {
             p.setIsReady(true);
-            if (p1.getIsReady() && p2.getIsReady()) {
-                setUpShips(p1, p2);
-                setUpShips(p2, p1);
-                run();
+            if(p2 != null){
+               if (p1.getIsReady() && p2.getIsReady()) {
+                   setUpShips(p1, p2);
+                   setUpShips(p2, p1);
+                   run();
+               }
             }
         } catch (Exception e) {
             e.printStackTrace();
